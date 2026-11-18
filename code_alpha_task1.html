@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Cards - Flashcard Quiz</title>
+
+<style>
+:root {
+  --purple: #6258e8;
+  --light: #f5f6fb;
+  --text: #20243a;
+  --muted: #747990;
+  --border: #e7e8f1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: var(--light);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 700px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 26px;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.panel {
+  background: white;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.progress {
+  height: 6px;
+  background: #eeeef6;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 12px 0 22px;
+}
+
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background: var(--purple);
+  transition: width 0.2s;
+}
+
+.flashcard {
+  min-height: 250px;
+  padding: 25px;
+  background: #f5f3ff;
+  border: 1px solid #e9e5ff;
+  border-radius: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tag {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--purple);
+}
+
+#cardText {
+  font-size: 25px;
+  overflow-wrap: anywhere;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--purple);
+  color: white;
+  border: none;
+}
+
+.danger {
+  color: #c43d55;
+  background: #fff0f2;
+}
+
+.show {
+  width: 100%;
+  max-width: 300px;
+  margin: auto;
+}
+
+.navigation,
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.navigation button,
+.actions button {
+  flex: 1;
+}
+
+.section-title {
+  margin-top: 28px;
+}
+
+.card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.card-item {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-info strong,
+.card-info small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.card-info small {
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.empty {
+  text-align: center;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  color: var(--muted);
+}
+
+form {
+  margin-top: 18px;
+  padding: 18px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+form label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.form-actions button {
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  text-align: center;
+  margin: 22px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .flashcard {
+    padding: 18px;
+  }
+
+  #cardText {
+    font-size: 22px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div>
+    <h1>Study Cards</h1>
+    <p class="subtitle">Learn, revise and remember</p>
+  </div>
+  <strong id="total">3 Cards</strong>
+</header>
+
+<section class="panel">
+
+  <div style="display:flex;justify-content:space-between">
+    <span id="cardNumber">CARD 1 OF 3</span>
+    <span id="percentage">33%</span>
+  </div>
+
+  <div class="progress">
+    <div id="progressFill"></div>
+  </div>
+
+  <div class="flashcard">
+    <span class="tag" id="sideLabel">QUESTION</span>
+
+    <h2 id="cardText">What is Python?</h2>
+
+    <button class="primary show" id="showBtn">
+      Show Answer
+    </button>
+  </div>
+
+  <div class="navigation">
+    <button id="prevBtn">← Previous</button>
+    <button class="primary" id="nextBtn">Next →</button>
+  </div>
+
+  <div class="actions">
+    <button id="editBtn">✎ Edit Card</button>
+    <button class="danger" id="deleteBtn">Delete</button>
+  </div>
+
+</section>
+
+<h3 class="section-title">Your Flashcards</h3>
+
+<div id="cardList" class="card-list"></div>
+
+<button class="primary"
+  id="addBtn"
+  style="width:100%;margin-top:14px">
+  + Add New Flashcard
+</button>
+
+<form id="cardForm" class="hidden">
+  <h3 id="formTitle">Add Flashcard</h3>
+
+  <label for="questionInput">Question (Front)</label>
+  <textarea id="questionInput" rows="3"
+    placeholder="Enter your question"
+    required></textarea>
+
+  <label for="answerInput">Answer (Back)</label>
+  <textarea id="answerInput" rows="3"
+    placeholder="Enter your answer"
+    required></textarea>
+
+  <div class="form-actions">
+    <button type="button" id="cancelBtn">Cancel</button>
+    <button type="submit" class="primary">Save Card</button>
+  </div>
+</form>
+
+<footer>
+  Your flashcards are saved in your browser.
+</footer>
+
+</div>
+
+<script>
+// Default flashcards
+const starterCards = [
+  {
+    id: 1,
+    q: "What is Python?",
+    a: "Python is a high-level programming language."
+  },
+  {
+    id: 2,
+    q: "What is a variable?",
+    a: "A variable stores a value in a program."
+  },
+  {
+    id: 3,
+    q: "What is a loop?",
+    a: "A loop repeats a block of code."
+  }
+];
+
+const STORAGE_KEY = "study-cards-deck-v1";
+
+let cards = [];
+let index = 0;
+let revealed = false;
+let editingId = null;
+
+// Get an HTML element by its ID
+function $(id) {
+  return document.getElementById(id);
+}
+
+// Load saved cards from browser storage
+function loadCards() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    cards = saved ? JSON.parse(saved) : starterCards.map(c => ({...c}));
+
+    if (!Array.isArray(cards)) {
+      throw new Error("Invalid saved data");
+    }
+  } catch (error) {
+    cards = starterCards.map(c => ({...c}));
+  }
+
+  index = 0;
+}
+
+// Save cards in browser storage
+function saveCards() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  } catch (error) {
+    alert("Could not save cards in this browser.");
+  }
+}
+
+// Display the current flashcard and the card list
+function render() {
+  const total = cards.length;
+
+  $("total").textContent = total + " Cards";
+
+  if (total === 0) {
+    $("cardNumber").textContent = "NO CARDS";
+    $("percentage").textContent = "0%";
+    $("progressFill").style.width = "0%";
+    $("sideLabel").textContent = "EMPTY DECK";
+    $("cardText").textContent = "Add your first flashcard!";
+    $("showBtn").textContent = "Show Answer";
+    $("cardList").innerHTML =
+      '<div class="empty">No flashcards yet. Add one to begin!</div>';
+
+    $("prevBtn").disabled = true;
+    $("nextBtn").disabled = true;
+    $("showBtn").disabled = true;
+    $("editBtn").disabled = true;
+    $("deleteBtn").disabled = true;
+    return;
+  }
+
+  index = Math.max(0, Math.min(index, total - 1));
+
+  const card = cards[index];
+  const percent = Math.round(((index + 1) / total) * 100);
+
+  $("cardNumber").textContent =
+    `CARD ${index + 1} OF ${total}`;
+
+  $("percentage").textContent = percent + "%";
+  $("progressFill").style.width = percent + "%";
+
+  // Show question or answer
+  $("sideLabel").textContent =
+    revealed ? "ANSWER" : "QUESTION";
+
+  $("cardText").textContent =
+    revealed ? card.a : card.q;
+
+  $("showBtn").textContent =
+    revealed ? "Hide Answer" : "Show Answer";
+
+  // Enable or disable navigation buttons
+  $("prevBtn").disabled = index === 0;
+  $("nextBtn").disabled = index === total - 1;
+
+  $("showBtn").disabled = false;
+  $("editBtn").disabled = false;
+  $("deleteBtn").disabled = false;
+
+  // Display all cards in the list
+  $("cardList").innerHTML = cards.map((c, i) => `
+    <div class="card-item">
+      <div class="card-info">
+        <strong>${escapeHTML(i + 1 + ". " + c.q)}</strong>
+        <small>${escapeHTML(c.a)}</small>
+      </div>
+      <button type="button"
+        data-action="study"
+        data-id="${c.id}">Open</button>
+      <button type="button"
+        data-action="edit"
+        data-id="${c.id}">Edit</button>
+    </div>
+  `).join("");
+}
+
+// Safely display user-entered text in the card list
+function escapeHTML(text) {
+  return String(text).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+// Show or hide the answer
+$("showBtn").addEventListener("click", function() {
+  if (cards.length === 0) return;
+
+  revealed = !revealed;
+  render();
+});
+
+// Go to the previous card
+$("prevBtn").addEventListener("click", function() {
+  if (index > 0) {
+    index--;
+    revealed = false;
+    render();
+  }
+});
+
+// Go to the next card
+$("nextBtn").addEventListener("click", function() {
+  if (index < cards.length - 1) {
+    index++;
+    revealed = false;
+    render();
+  }
+});
+
+// Open the form to add or edit a card
+function openForm(id = null) {
+  editingId = id;
+
+  const card = cards.find(c => c.id === id);
+
+  $("formTitle").textContent =
+    card ? "Edit Flashcard" : "Add Flashcard";
+
+  $("questionInput").value = card ? card.q : "";
+  $("answerInput").value = card ? card.a : "";
+
+  $("cardForm").classList.remove("hidden");
+  $("questionInput").focus();
+}
+
+// Close and clear the form
+function closeForm() {
+  $("cardForm").classList.add("hidden");
+  $("cardForm").reset();
+  editingId = null;
+}
+
+// Add a new flashcard
+$("addBtn").addEventListener("click", function() {
+  openForm();
+});
+
+// Edit the current flashcard
+$("editBtn").addEventListener("click", function() {
+  if (cards[index]) {
+    openForm(cards[index].id);
+  }
+});
+
+// Cancel editing or adding
+$("cancelBtn").addEventListener("click", closeForm);
+
+// Save a new or edited flashcard
+$("cardForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const q = $("questionInput").value.trim();
+  const a = $("answerInput").value.trim();
+
+  if (!q || !a) {
+    alert("Please enter both a question and an answer.");
+    return;
+  }
+
+  if (editingId !== null) {
+    const cardIndex = cards.findIndex(
+      c => c.id === editingId
+    );
+
+    if (cardIndex !== -1) {
+      cards[cardIndex].q = q;
+      cards[cardIndex].a = a;
+      index = cardIndex;
+    }
+  } else {
+    const newId = Math.max(0, ...cards.map(c => c.id)) + 1;
+
+    cards.push({
+      id: newId,
+      q: q,
+      a: a
+    });
+
+    index = cards.length - 1;
+  }
+
+  revealed = false;
+  saveCards();
+  closeForm();
+  render();
+});
+
+// Delete the current flashcard
+$("deleteBtn").addEventListener("click", function() {
+  if (!cards[index]) return;
+
+  const confirmed = confirm(
+    "Are you sure you want to delete this flashcard?"
+  );
+
+  if (!confirmed) return;
+
+  cards.splice(index, 1);
+  index = Math.max(0, index - 1);
+  revealed = false;
+
+  saveCards();
+  render();
+});
+
+// Handle Open and Edit buttons in the card list
+$("cardList").addEventListener("click", function(event) {
+  const button = event.target.closest("button[data-action]");
+
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const cardIndex = cards.findIndex(c => c.id === id);
+
+  if (cardIndex === -1) return;
+
+  if (button.dataset.action === "study") {
+    index = cardIndex;
+    revealed = false;
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (button.dataset.action === "edit") {
+    openForm(id);
+  }
+});
+
+// Start the application
+loadCards();
+render();
+</script>
+</body>
+</html>
